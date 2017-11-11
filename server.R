@@ -1,15 +1,7 @@
-library(leaflet)
-library(RColorBrewer)
-library(scales)
-library(lattice)
-library(dplyr)
 
 # Leaflet bindings are a bit slow; for now we'll just sample to compensate
 set.seed(100)
-# zipdata <- allzips[sample.int(nrow(allzips), 10000),]
-# By ordering by centile, we ensure that the (comparatively rare) SuperZIPs
-# will be drawn last and thus be easier to see
-# zipdata <- zipdata[order(zipdata$centile),]
+
 
 function(input, output, session) {
 
@@ -45,56 +37,16 @@ function(input, output, session) {
         longitude >= lngRng[1] & longitude <= lngRng[2])
   })
 
-#   # Precalculate the breaks we'll need for the two histograms
-#   #centileBreaks <- hist(plot = FALSE, allzips$centile, breaks = 20)$breaks
-#
-#   # output$histCentile <- renderPlot({
-#   #   # If no zipcodes are in view, don't plot
-#   #   if (nrow(zipsInBounds()) == 0)
-#   #     return(NULL)
-#   #
-#   #   hist(zipsInBounds()$centile,
-#   #     breaks = centileBreaks,
-#   #     main = "SuperZIP score (visible zips)",
-#   #     xlab = "Percentile",
-#   #     xlim = range(allzips$centile),
-#   #     col = '#00DD00',
-#   #     border = 'white')
-#   # })
-#
-#   # output$scatterCollegeIncome <- renderPlot({
-#   #   # If no zipcodes are in view, don't plot
-#   #   if (nrow(zipsInBounds()) == 0)
-#   #     return(NULL)
-#   #
-#   #   print(xyplot(income ~ college, data = zipsInBounds(), xlim = range(allzips$college), ylim = range(allzips$income)))
-#   # })
-#
+
+
   # This observer is responsible for maintaining the circles and legend,
   # according to the variables the user has chosen to map to color and size.
   observe({
     colorBy <- input$color
     sizeBy <- input$size
 
-    # if (colorBy == "superzip") {
-    #   # Color and palette are treated specially in the "superzip" case, because
-    #   # the values are categorical instead of continuous.
-    #   colorData <- ifelse(cleantable$preds >= (100 - input$threshold), "yes", "no")
-    #   pal <- colorFactor("viridis", colorData)
-    # } else {
-    #   colorData <- zipdata[[colorBy]]
-    #   pal <- colorBin("viridis", colorData, 7, pretty = FALSE)
-    # }
-    #
-    # if (sizeBy == "superzip") {
-    #   # Radius is treated specially in the "superzip" case.
-    #   radius <- ifelse(cleantable$predds >= (100 - input$threshold), 30000, 3000)
-    # } else {
-    #   radius <- cleantable[[sizeBy]] / max(cleantable[[sizeBy]]) * 10000
-    # }
-
     pal <- colorBin(
-      palette = c("black", "red"),
+      palette = c("green", "red"),
       domain = cleantable$Preds,
       6,
       pretty = FALSE
@@ -102,25 +54,9 @@ function(input, output, session) {
 
     leafletProxy("map", data = cleantable) %>%
       clearShapes() %>%
-      addCircles(~Long, ~Lat, radius = 100, color = ~pal(cleantable$Preds), stroke = FALSE) # %>%
-      # addLegend("bottomleft", pal=pal, values=colorData, title=colorBy,
-      #   layerId="colorLegend")
+      addCircles(~Long, ~Lat, radius = 400, color = ~pal(cleantable$Preds), stroke = FALSE, fillOpacity = .6) # %>%
   })
-#
-#   # # Show a popup at the given location
-#   # showZipcodePopup <- function(zipcode, lat, lng) {
-#   #   selectedZip <- allzips[allzips$zipcode == zipcode,]
-#   #   content <- as.character(tagList(
-#   #     tags$h4("Score:", as.integer(selectedZip$centile)),
-#   #     tags$strong(HTML(sprintf("%s, %s %s",
-#   #       selectedZip$city.x, selectedZip$state.x, selectedZip$zipcode
-#   #     ))), tags$br(),
-#   #     sprintf("Median household income: %s", dollar(selectedZip$income * 1000)), tags$br(),
-#   #     sprintf("Percent of adults with BA: %s%%", as.integer(selectedZip$college)), tags$br(),
-#   #     sprintf("Adult population: %s", selectedZip$adultpop)
-#   #   ))
-#   #   leafletProxy("map") %>% addPopups(lng, lat, content, layerId = zipcode)
-#   # }
+
 
   # # When map is clicked, show a popup with city info
   observe({
@@ -130,7 +66,6 @@ function(input, output, session) {
       return()
 
     isolate({
-      # showZipcodePopup(event$id, event$lat, event$lng)
       print(paste('Lat = ', event$lat, 'Long = ', event$lng))
       index <- which(preds_DF$Latitude == event$lat & preds_DF$Longitude == event$lng)
       
@@ -138,34 +73,6 @@ function(input, output, session) {
     })
   })
 
-
-  ## Data Explorer ###########################################
-
-  observe({
-    cities <- if (is.null(input$states)) character(0) else {
-      filter(cleantable, State %in% input$states) %>%
-        `$`('City') %>%
-        unique() %>%
-        sort()
-    }
-    stillSelected <- isolate(input$cities[input$cities %in% cities])
-    updateSelectInput(session, "cities", choices = cities,
-      selected = stillSelected)
-  })
-
-  observe({
-    zipcodes <- if (is.null(input$states)) character(0) else {
-      cleantable %>%
-        filter(State %in% input$states,
-          is.null(input$cities) | City %in% input$cities) %>%
-        `$`('Zipcode') %>%
-        unique() %>%
-        sort()
-    }
-    stillSelected <- isolate(input$zipcodes[input$zipcodes %in% zipcodes])
-    updateSelectInput(session, "zipcodes", choices = zipcodes,
-      selected = stillSelected)
-  })
 
   observe({
     if (is.null(input$goto))
@@ -182,18 +89,5 @@ function(input, output, session) {
     })
   })
 
-  output$ziptable <- DT::renderDataTable({
-    df <- cleantable %>%
-      filter(
-        Score >= input$minScore,
-        Score <= input$maxScore,
-        is.null(input$states) | State %in% input$states,
-        is.null(input$cities) | City %in% input$cities,
-        is.null(input$zipcodes) | Zipcode %in% input$zipcodes
-      ) %>%
-      mutate(Action = paste('<a class="go-map" href="" data-lat="', Lat, '" data-long="', Long, '" data-zip="', Zipcode, '"><i class="fa fa-crosshairs"></i></a>', sep=""))
-    action <- DT::dataTableAjax(session, df)
 
-    DT::datatable(df, options = list(ajax = list(url = action)), escape = FALSE)
-  })
 }

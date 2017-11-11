@@ -28,8 +28,8 @@ three11traffic_clean <- three11_data %>%
          streetSign = ifelse(grepl('street sign', TITLE), 1, 0),
          traffic = ifelse(grepl('traffic', TITLE), 1, 0),
          streetLight = ifelse(grepl('streetlight', TITLE), 1, 0),
-         Latitude = round(Latitude, 3),
-         Longitude = round(Longitude,3)) %>% 
+         Latitude = round(Latitude, 2),
+         Longitude = round(Longitude, 2)) %>% 
   select(Latitude, Longitude, potholes, road, bball, tree, rightOfWay, streetSign, traffic, streetLight) %>% 
   group_by(Latitude, Longitude) %>% 
   summarise_all(funs(sum)) 
@@ -38,8 +38,8 @@ traffic_data_clean <- traffic_data %>%
         filter(!is.na(CRSH_LEVL)) %>% 
         mutate(date_val = mdy_hm(DATE_VAL),
                crash = ifelse(CRSH_LEVL < 4, 1, 0),
-               Latitude = round(LATITUDE, 3),
-               Longitude = round(LONGITUDE, 3),
+               Latitude = round(LATITUDE, 2),
+               Longitude = round(LONGITUDE, 2),
                ToD = gsub('.{2}$', '', MILT_TIME),
                ToD = ifelse(ToD == '', 0, ToD)) %>% 
         rename(DoW = DAY_OF_WEEK_DESC) %>% 
