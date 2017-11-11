@@ -136,4 +136,8 @@ explainer = buildExplainer(xgb.model = xgb_1, trainingData = df_train_Dmatrix, t
 showWaterfall(xgb_1, explainer, df_full_Dmatrix, df_full_matrix,  10, type = "binary")
 
 saveRDS(preds_DF, file = 'preds_DF.RDS')
+saveRDS(xgb_1, file = 'xgb_1.RDS')
+saveRDS(explainer, file = 'explainer.RDS')
+saveRDS(df_full_Dmatrix, file = 'df_full_Dmatrix.RDS')
+saveRDS(df_full_matrix, file = 'df_full_matrix.RDS')
 
