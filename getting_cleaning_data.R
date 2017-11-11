@@ -38,14 +38,13 @@ traffic_data_clean <- traffic_data %>%
                ToD = ifelse(ToD == '', 0, ToD)) %>% 
         rename(DoW = DAY_OF_WEEK_DESC) %>% 
         select(Latitude, Longitude, ToD, DoW, CRASH_TYPE, LIT, WTHR, PRIMARY_CAUSE, NUM_LNS, RD_COND, RD_SURF, TRFC_CTRL, crash) %>% 
-        dummy.data.frame(names = c('ToD', 'DoW', 'CRASH_TYPE', 'LIT', 'WTHR', 'PRIMARY_CAUSE', 'NUM_LNS', 'RD_COND', 'RD_SURF', 'TRFC_CTRL'), drop = TRUE) %>% 
+        as.data.frame() %>% 
+        dummy.data.frame(names = c('ToD', 'DoW', 'CRASH_TYPE', 'LIT', 'WTHR', 'PRIMARY_CAUSE', 'RD_COND', 'RD_SURF', 'TRFC_CTRL'), drop = TRUE) %>% 
         group_by(Latitude, Longitude) %>% 
         summarise_all(funs(mean))
 
-
-
-ggplot(traffic_months, aes(x = DAY_OF_WEEK_DESC, y = count)) + 
-  geom_col()
+all_combined <- traffic_data_clean %>% 
+  left_join(three11traffic_clean, by = c('Longitude', 'Latitude'))
 
 
 
