@@ -31,10 +31,6 @@ function(input, output, session) {
   })
   
   
-  observe({
-        updateSelectInput(session, 'gridID', 'Select Location', choices = seq(1:nrow(preds_DF)), selected = output$index)
-  })
-  
   # A reactive expression that returns the set of zips that are
   # in bounds right now
   zipsInBounds <- reactive({
@@ -133,10 +129,12 @@ function(input, output, session) {
     if (is.null(event))
       return()
 
-    output$index <- isolate({
+    isolate({
       # showZipcodePopup(event$id, event$lat, event$lng)
       print(paste('Lat = ', event$lat, 'Long = ', event$lng))
       index <- which(preds_DF$Latitude == event$lat & preds_DF$Longitude == event$lng)
+      
+      updateSelectInput(session, 'gridID', 'Select Location', choices = seq(1:nrow(preds_DF)), selected = index)
     })
   })
 

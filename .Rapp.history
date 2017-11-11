@@ -1,0 +1,3 @@
+load("/Users/rangi/Projects/QueenCityOutliers/df_full_Dmatrix.RDS")
+readRDS(file = 'df_full_DMatrix.RDS')
+df_full_DMatrix <- readRDS(file = 'df_full_DMatrix.RDS')
