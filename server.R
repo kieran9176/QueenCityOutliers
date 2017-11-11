@@ -31,18 +31,8 @@ function(input, output, session) {
   })
   
   
-  observeEvent(input$stations,{
-    updateSelectInput(session, "stations", "Click on Station", 
-                      choices = levels(factor(quakes$stations)), 
-                      selected = c(input$stations))
-  })
-  
-  observeEvent(input$map_marker_click, {
-    click <- input$map_marker_click
-    index <- which(preds_DF$Latitude == click$lat & preds_DF$Longitude == click$lng)
-    updateSelectInput(session, "stations", "Click on Station", 
-                      choices = levels(factor(quakes$stations)), 
-                      selected = c(input$stations, station))
+  observe({
+        updateSelectInput(session, 'gridID', 'Select Location', choices = seq(1:nrow(preds_DF)), selected = output$index)
   })
   
   # A reactive expression that returns the set of zips that are
@@ -143,9 +133,11 @@ function(input, output, session) {
     if (is.null(event))
       return()
 
-    # isolate({
-    #   showZipcodePopup(event$id, event$lat, event$lng)
-    # })
+    output$index <- isolate({
+      # showZipcodePopup(event$id, event$lat, event$lng)
+      print(paste('Lat = ', event$lat, 'Long = ', event$lng))
+      index <- which(preds_DF$Latitude == event$lat & preds_DF$Longitude == event$lng)
+    })
   })
 
 

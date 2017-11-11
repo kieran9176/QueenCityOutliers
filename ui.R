@@ -31,16 +31,13 @@ navbarPage("Charlotte Traffic Incidents", id="nav",
 
         h2("XGBoost Explainer"),
         selectInput('gridID', 'Select Location', choices = seq(1:nrow(preds_DF)), selected = 1),
-        # conditionalPanel("input.color == 'superzip' || input.size == 'superzip'",
-        #   # Only prompt for threshold when coloring or sizing by superzip
-        #   numericInput("threshold", "SuperZIP threshold (top n percentile)", 5)
-        # ),
-        # This is where we want our xgbExplainer plot to show
-        plotOutput("xgbplot", height = 350)
+
+        plotOutput("xgbplot", height = 350),
+        textOutput('Click_text')
       ),
 
       tags$div(id="cite",
-        'Data compiled for ', tags$em('Coming Apart: The State of White America, 1960–2010'), ' by Charles Murray (Crown Forum, 2012).'
+        'Queen City Outliers', tags$em('- Traffic Incident Model'), ' by Ryan Angi, Josh Lee, Dylan Swanson, Kieran Derfus, and Mason Kirchner.'
       )
     )
   )
