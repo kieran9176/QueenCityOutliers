@@ -52,10 +52,10 @@ traffic_data_clean <- traffic_data %>%
                RD_COND = gsub(' |,', '_',RD_COND),
                RD_SURF = gsub(' |,', '_',RD_SURF),
                TRFC_CTRL = gsub(' |,', '_',TRFC_CTRL)) %>% 
-        select(-ToD, -DoW, -CRASH_TYPE, -PRIMARY_CAUSE) %>% 
-        dummy.data.frame(names = c( 'LIT', 'WTHR', 'RD_COND', 'RD_SURF', 'TRFC_CTRL'), drop = TRUE) %>% 
-        select(-TRFC_CTRLOther, -RD_SURFOther,  -WTHROther, -LITUnknown) %>% # Remove variables for singularity
-  # -PRIMARY_CAUSEUnknown, -CRASH_TYPEUnknown, -DoWSaturday, -ToD0
+        select(-ToD, -DoW, -CRASH_TYPE, -PRIMARY_CAUSE, -WTHR) %>% 
+        dummy.data.frame(names = c( 'LIT', 'RD_COND', 'RD_SURF', 'TRFC_CTRL'), drop = TRUE) %>% 
+        select(-TRFC_CTRLOther, -RD_SURFOther, -LITUnknown) %>% # Remove variables for singularity
+  # -PRIMARY_CAUSEUnknown, -CRASH_TYPEUnknown, -DoWSaturday, -ToD0, -WTHROther
         group_by(Latitude, Longitude) %>% 
         summarise_all(funs(mean)) %>% 
         ungroup() %>% 
@@ -138,6 +138,6 @@ showWaterfall(xgb_1, explainer, df_full_Dmatrix, df_full_matrix,  10, type = "bi
 saveRDS(preds_DF, file = 'preds_DF.RDS')
 saveRDS(xgb_1, file = 'xgb_1.RDS')
 saveRDS(explainer, file = 'explainer.RDS')
-saveRDS(df_full_Dmatrix, file = 'df_full_Dmatrix.RDS')
+saveRDS(all_combined$crash, file = 'all_combined_crash.RDS')
 saveRDS(df_full_matrix, file = 'df_full_matrix.RDS')
 

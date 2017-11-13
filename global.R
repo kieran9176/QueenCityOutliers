@@ -15,14 +15,18 @@ library(lattice)
 library(leaflet)
 
 
-# Read in data from build
+# Change your wd to where ever the RDS files are saved
 setwd('~/Projects/QueenCityOutliers/')
-# df_full_DMatrix <- readRDS(file = 'df_full_DMatrix.RDS')
+
+
+# Read in data from build
 xgb_1 <- readRDS(file = 'xgb_1.RDS')
 explainer <- readRDS(file = 'explainer.RDS')
 df_full_matrix<- readRDS(file = 'df_full_matrix.RDS')
 preds_DF <- readRDS(file = 'preds_DF.RDS')
 allzips <- readRDS("preds_DF.RDS")
+all_combined_crash <- readRDS("all_combined_crash.RDS")
+df_full_Dmatrix <- xgb.DMatrix(df_full_matrix, label = all_combined_crash)
 allzips$latitude <- jitter(allzips$latitude)
 allzips$longitude <- jitter(allzips$longitude)
 index <- 1
